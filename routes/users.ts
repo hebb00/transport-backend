@@ -9,7 +9,7 @@ router.post('/register', async function(req, res, next) {
   const firstName : string = req.body.firstName;
   const lasttName : string = req.body.lastName;
   const userName : string = req.body.userName;
-  const phoneNum : string = req.body.phoneNumber; //req.body.phoneNum; smh
+  const phoneNum : string = req.body.phoneNumber; //req.body.phoneNum; smh sorryy
   const password : string = req.body.password;
   const hashedPass : string = bcrypt.hashSync(password,10);
   const created_on : any = dayjs().format()
