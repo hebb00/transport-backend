@@ -12,6 +12,10 @@ var logger = require("morgan");
 var cors = require("cors");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+var driversRouter = require("./routes/drivers");
+var clientsRouter = require("./routes/clients");
+var vehiclesRouter = require("./routes/vehicles");
+var reservationsRouter = require("./routes/reservations");
 var app = (0, express_1.default)();
 // view engine setup
 // app.set("views", path.join(__dirname, "views"));
@@ -24,6 +28,10 @@ app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/drivers", driversRouter);
+app.use("/clients", clientsRouter);
+app.use("/vehicles", vehiclesRouter);
+app.use("/reservations", reservationsRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
