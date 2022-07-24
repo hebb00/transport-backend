@@ -3,7 +3,9 @@ var router = express.Router();
 var database = require("./database")
 
 
-router.post('/reservation', async function (req, res, next) {
+router.post('/reservation/:id', async function (req, res, next) {
+    const id = req.params.id;
+    console.log(id, "user id")
     const description: string = req.body.Description;
     const subject: string = req.body.Subject;
     const startTime = req.body.StartTime;
@@ -15,12 +17,14 @@ router.post('/reservation', async function (req, res, next) {
     const driver_id = req.body.TaskId;
     const vehicle_id = req.body.ProjectId;
     const isFullDay = req.body.IsAllDay;
+    console.log(description, subject, startTime, endTime, "reservation")
+    console.log(source, client_id, destination, price, driver_id, vehicle_id, isFullDay)
 
 
     const info = `INSERT INTO reservations(description, subject, start_time, end_time, source, destination,
                  price, client_id, user_id, driver_id, vehicle_id, isFullDay)
-                VALUES('${description}', '${subject}','${startTime}', '${endTime}','${source}', '${destination}',
-                ${price}, ${client_id}, ${driver_id}, ${vehicle_id},${isFullDay} )`;
+                VALUES('${description}', '${subject}', '${startTime}', '${endTime}', '${source}', '${destination}',
+                ${price}, ${client_id}, ${id}, ${driver_id}, ${vehicle_id}, ${isFullDay} )`;
     try {
         await database.query(info);
         return res.status(200).json({ "done": "something reservation" });

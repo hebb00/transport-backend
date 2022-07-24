@@ -20,9 +20,17 @@ router.post('/register', async function(req, res, next) {
 
   try{
     await database.query(q)
-    let result = await logIn(req.body)
+    let result = await logIn(req.body);
     if(result){
-      console.log(result)
+      let user ={
+        id: result.id,
+        firstname:result.firstname,
+        lastname:result.lastname, 
+        username:result.username,
+        phone_num:result.phone_num,
+      }
+      // req.session.user = user;
+      // console.log("user session",req.session.user);
       return res.json(result);
     }
     else{
@@ -37,7 +45,6 @@ router.post('/register', async function(req, res, next) {
 async function logIn(body:any) {
   var userName = body.userName;
   var q = `SELECT id, firstname, lastname, username, password, phone_num FROM users WHERE username = '${userName}'`;
-  rows = [];
   try {
     var { rows, rowCount } = await database.query(q);
     if (rowCount == 0) {
@@ -90,10 +97,31 @@ router.post('/modify/:id', async function(req, res, next) {
 
 
 router.post('/login', async function(req, res, next) {
+  var check = req.body.check;
+  console.log(check,"this is check")
   try {
     let value = await logIn(req.body);
     if(value){
-      console.log("it works",value);
+      let user ={
+        id: value.id,
+        firstname:value.firstname,
+        lastname:value.lastname, 
+        username:value.username,
+        phone_num:value.phone_num,
+      }
+      // req.session.user = user
+      // console.log(" in session ",req.session.user);
+
+      // if (check) {
+      //   res.cookie("user", req.session.user);
+      //   console.log(" in cookie ",req.cookies);
+
+      // }  
+
+      // console.log("user id in session",req.session.user);
+      // res.locals ={
+      //   user:user,
+      // }
       return res.json(value);
     } else{
       return res.status(400).json({"error": "something" });

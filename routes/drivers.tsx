@@ -73,7 +73,6 @@ router.post("/modify-driver/:id", async function (req, res, next) {
     const licenseExpDate: string = req.body.licenseExpDate;
     console.log(req.body, "req body ");
 
-
     const qq = `UPDATE drivers SET firstname = '${firstName}', lastname = '${lastName}', phone_num = '${phoneNumber}',
              license_num = ${licenseNum}, license_type = '${licenseType}', license_exp_date = '${licenseExpDate}' WHERE id = ${id}`;
     try {
@@ -91,6 +90,24 @@ router.get("/driver/:id", async function (req, res, next) {
     try {
         await database.query(query);
         return res.status(200).json({ "done": "something driver delete" });
+    } catch (error) {
+        console.log("DATABASE EERROR", error)
+    }
+});
+
+router.get("/statistic", async function (req, res, next) {
+
+    const query = `SELECT count(id) AS num_driver FROM drivers`;
+    try {
+
+        var { rows } = await database.query(query);
+        if (rows) {
+            res.json(rows[0])
+            console.log(rows[0], "driver ");
+        } else {
+            return res.status(400).json({ "error": "something" });
+        }
+
     } catch (error) {
         console.log("DATABASE EERROR", error)
     }

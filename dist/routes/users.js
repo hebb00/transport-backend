@@ -33,7 +33,15 @@ router.post('/register', function (req, res, next) {
             yield database.query(q);
             let result = yield logIn(req.body);
             if (result) {
-                console.log(result);
+                let user = {
+                    id: result.id,
+                    firstname: result.firstname,
+                    lastname: result.lastname,
+                    username: result.username,
+                    phone_num: result.phone_num,
+                };
+                // req.session.user = user;
+                // console.log("user session",req.session.user);
                 return res.json(result);
             }
             else {
@@ -49,7 +57,6 @@ function logIn(body) {
     return __awaiter(this, void 0, void 0, function* () {
         var userName = body.userName;
         var q = `SELECT id, firstname, lastname, username, password, phone_num FROM users WHERE username = '${userName}'`;
-        rows = [];
         try {
             var { rows, rowCount } = yield database.query(q);
             if (rowCount == 0) {
@@ -103,10 +110,28 @@ router.post('/modify/:id', function (req, res, next) {
 });
 router.post('/login', function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        var check = req.body.check;
+        console.log(check, "this is check");
         try {
             let value = yield logIn(req.body);
             if (value) {
-                console.log("it works", value);
+                let user = {
+                    id: value.id,
+                    firstname: value.firstname,
+                    lastname: value.lastname,
+                    username: value.username,
+                    phone_num: value.phone_num,
+                };
+                // req.session.user = user
+                // console.log(" in session ",req.session.user);
+                // if (check) {
+                //   res.cookie("user", req.session.user);
+                //   console.log(" in cookie ",req.cookies);
+                // }  
+                // console.log("user id in session",req.session.user);
+                // res.locals ={
+                //   user:user,
+                // }
                 return res.json(value);
             }
             else {

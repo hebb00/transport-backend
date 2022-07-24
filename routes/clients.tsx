@@ -83,7 +83,24 @@ router.get("/modify-client/:id", async function (req, res, next) {
 
 });
 
+router.get("/statistic", async function (req, res, next) {
 
+    const query = `SELECT count(id) AS num_clients FROM clients`;
+    try {
+
+        var { rows } = await database.query(query);
+        if (rows) {
+            res.json(rows[0])
+            console.log(rows[0], "clients ");
+        } else {
+            return res.status(400).json({ "error": "something" });
+        }
+
+    } catch (error) {
+        console.log("DATABASE EERROR", error)
+    }
+
+});
 
 
 
