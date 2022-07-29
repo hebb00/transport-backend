@@ -31,7 +31,6 @@ router.get("/vehicle", async function (req, res, next) {
         console.log("DATABASE EERROR", error)
     }
 });
-
 router.get("/vehicle/:id", async function (req, res, next) {
     const id = req.params.id;
     console.log("id", id);
@@ -84,7 +83,7 @@ router.get("/modify-vehicle/:id", async function (req, res, next) {
 
 router.get("/statistic", async function (req, res, next) {
 
-    const query = `SELECT count(id) AS num_vehicles FROM vehicles`;
+    const query = `SELECT count(id) AS num FROM vehicles`;
     try {
 
         var { rows } = await database.query(query);
