@@ -85,7 +85,7 @@ router.get("/modify-client/:id", async function (req, res, next) {
 
 router.get("/statistic", async function (req, res, next) {
 
-    const query = `SELECT count(id) AS num_clients FROM clients`;
+    const query = `SELECT count(id) AS num FROM clients`;
     try {
 
         var { rows } = await database.query(query);

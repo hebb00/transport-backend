@@ -102,7 +102,7 @@ router.get("/modify-client/:id", function (req, res, next) {
 });
 router.get("/statistic", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = `SELECT count(id) AS num_clients FROM clients`;
+        const query = `SELECT count(id) AS num FROM clients`;
         try {
             var { rows } = yield database.query(query);
             if (rows) {

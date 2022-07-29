@@ -110,7 +110,7 @@ router.get("/driver/:id", function (req, res, next) {
 });
 router.get("/statistic", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = `SELECT count(id) AS num_driver FROM drivers`;
+        const query = `SELECT count(id) AS num FROM drivers`;
         try {
             var { rows } = yield database.query(query);
             if (rows) {
