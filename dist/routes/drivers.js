@@ -126,4 +126,23 @@ router.get("/statistic", function (req, res, next) {
         }
     });
 });
+router.get("/pie", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = `SELECT count(license_type) AS num FROM 
+        drivers WHERE license_type= 'heavy'`;
+        try {
+            var { rows } = yield database.query(query);
+            if (rows) {
+                res.json(rows[0]);
+                console.log(rows[0], "driver ");
+            }
+            else {
+                return res.status(400).json({ "error": "something" });
+            }
+        }
+        catch (error) {
+            console.log("DATABASE EERROR", error);
+        }
+    });
+});
 module.exports = router;
