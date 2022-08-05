@@ -24,7 +24,7 @@ router.post('/reservation/:id', function (req, res, next) {
         const startTime = req.body.StartTime;
         const endTime = req.body.EndTime;
         const source = req.body.source;
-        const client_id = req.body.client;
+        const client_id = req.body.client_id;
         const destination = req.body.Location;
         const price = req.body.price;
         const driver_id = req.body.driver_id;
@@ -47,8 +47,8 @@ router.post('/reservation/:id', function (req, res, next) {
 });
 router.get("/reservation", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = `SELECT id AS "Id", subject AS "Subject", description AS "Description", start_time AS"StartTime",
-         end_time AS "EndTime", source, destination AS "Location", driver_id, vehicle_id, isallday AS "IsAllDay"  FROM reservations`;
+        const query = `SELECT id AS "Id", subject AS "Subject", description AS "Description", start_time AS "StartTime",
+         end_time AS "EndTime", source, destination AS "Location", driver_id, vehicle_id, price, isallday AS "IsAllDay" FROM reservations`;
         try {
             const { rows } = yield database.query(query);
             if (rows) {
@@ -78,17 +78,17 @@ router.get("/delete-reservation/:id", function (req, res, next) {
         }
     });
 });
-router.post("/modify-reservation/:id", function (req, res, next) {
+router.post("/modify-reservation/:bookingId/:userId", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user_id = req.params.id;
-        const id = req.body.Id;
+        const user_id = req.params.userId;
+        const id = req.params.bookingId;
         console.log("updated event id", id);
         const description = req.body.Description;
         const subject = req.body.Subject;
         const startTime = req.body.StartTime;
         const endTime = req.body.EndTime;
         const source = req.body.source;
-        const client_id = req.body.client;
+        const client_id = req.body.client_id;
         const destination = req.body.Location;
         const price = req.body.price;
         const driver_id = req.body.driver_id;
@@ -112,9 +112,9 @@ router.post("/modify-reservation/:id", function (req, res, next) {
 router.get("/clients-reservation", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("here client reservations");
-        const query = `SELECT clients.firstname , clients.lastname ,count(reservations.id) AS num_books
-    FROM clients JOIN reservations on clients.id = reservations.client_id 
-    GROUP BY clients.id`;
+        const query = `SELECT concat(clients.firstname, ' ',clients.lastname) AS clientname,
+     count(*) AS num_books FROM clients JOIN reservations ON
+     clients.id = reservations.client_id GROUP BY clients.id ORDER BY num_books DESC`;
         try {
             const { rows } = yield database.query(query);
             if (rows) {
@@ -135,6 +135,73 @@ router.get("/statistic", function (req, res, next) {
             if (rows) {
                 res.json(rows[0]);
                 console.log(rows[0], "book ");
+            }
+            else {
+                return res.status(400).json({ "error": "something" });
+            }
+        }
+        catch (error) {
+            console.log("DATABASE EERROR", error);
+        }
+    });
+});
+router.get("/graph", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = `SELECT DISTINCT
+                start_time::date AS day, 
+                sum(cast(extract (epoch  from (end_time - start_time))/3600 as int)) as hours
+                from reservations
+                GROUP by day ORDER BY day LIMIT 7;`;
+        try {
+            var { rows } = yield database.query(query);
+            if (rows) {
+                res.json(rows);
+                console.log(rows, "graph stuff ");
+            }
+            else {
+                return res.status(400).json({ "error": "something" });
+            }
+        }
+        catch (error) {
+            console.log("DATABASE EERROR", error);
+        }
+    });
+});
+router.get("/reservation/table", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = ` SELECT reservations.id AS "Id", reservations.subject AS "Subject",  reservations.description AS "Description",  reservations.start_time AS"StartTime",
+         reservations.end_time AS "EndTime",  reservations.source,  reservations.destination AS "Location",  reservations.price,  reservations.isallday AS "IsAllDay",
+         concat(clients.firstname,' ', clients.lastname) AS clientname, vehicles.plate_num,concat(drivers.firstname,' ',drivers.lastname)AS drivername  FROM reservations LEFT JOIN
+         clients ON  reservations.client_id = clients.id LEFT JOIN vehicles ON reservations.vehicle_id = vehicles.id LEFT JOIN drivers ON
+          reservations.driver_id = drivers.id;`;
+        try {
+            const { rows } = yield database.query(query);
+            if (rows) {
+                res.json(rows);
+                console.log(rows, "books ");
+            }
+            else {
+                return res.status(400).json({ "error": "something" });
+            }
+        }
+        catch (error) {
+            console.log("DATABASE EERROR", error);
+        }
+    });
+});
+router.get("/reservation/table/:id", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.params.id;
+        const query = ` SELECT reservations.id AS "Id", reservations.subject AS "Subject",  reservations.description AS "Description",  reservations.start_time AS"StartTime",
+         reservations.end_time AS "EndTime",  reservations.source,  reservations.destination AS "Location",  reservations.price,  reservations.isallday AS "IsAllDay",
+         concat(clients.firstname,' ', clients.lastname) AS clientname, vehicles.plate_num,concat(drivers.firstname,' ',drivers.lastname)AS drivername  FROM reservations LEFT JOIN
+         clients ON  reservations.client_id = clients.id LEFT JOIN vehicles ON reservations.vehicle_id = vehicles.id LEFT JOIN drivers ON
+         reservations.driver_id = drivers.id WHERE reservations.id = ${id}`;
+        try {
+            const { rows } = yield database.query(query);
+            if (rows) {
+                res.json(rows);
+                console.log(rows, "books ");
             }
             else {
                 return res.status(400).json({ "error": "something" });
