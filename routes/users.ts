@@ -10,27 +10,16 @@ router.post('/register', async function(req, res, next) {
   const lastName : string = req.body.lastName;
   const userName : string = req.body.userName;
   const phoneNum : string = req.body.phoneNumber; //req.body.phoneNum; smh 
+  const role: string = req.body.role;
   const password : string = req.body.password;
   const hashedPass : string = bcrypt.hashSync(password,10);
-  const created_on : any = dayjs().format()
-
-  console.log(req.body,hashedPass,created_on)
-  var q : string = `INSERT INTO users (firstname, lastname, username, password, created_on, phone_num)
-    VALUES ('${firstName}', '${lastName}', '${userName}', '${hashedPass}', '${created_on}', '${phoneNum}');`
+  var q : string = `INSERT INTO users (firstname, lastname, username, password, phone_num, role)
+    VALUES ('${firstName}', '${lastName}', '${userName}', '${hashedPass}', '${phoneNum}','${role}');`
 
   try{
     await database.query(q)
     let result = await logIn(req.body);
     if(result){
-      let user ={
-        id: result.id,
-        firstname:result.firstname,
-        lastname:result.lastname, 
-        username:result.username,
-        phone_num:result.phone_num,
-      }
-      // req.session.user = user;
-      // console.log("user session",req.session.user);
       return res.json(result);
     }
     else{
@@ -44,7 +33,8 @@ router.post('/register', async function(req, res, next) {
 
 async function logIn(body:any) {
   var userName = body.userName;
-  var q = `SELECT id, firstname, lastname, username, password, phone_num FROM users WHERE username = '${userName}'`;
+  var q = `SELECT id, firstname, lastname, username, password,
+     phone_num, role FROM users WHERE username = '${userName}'`;
   try {
     var { rows, rowCount } = await database.query(q);
     if (rowCount == 0) {
@@ -102,26 +92,6 @@ router.post('/login', async function(req, res, next) {
   try {
     let value = await logIn(req.body);
     if(value){
-      let user ={
-        id: value.id,
-        firstname:value.firstname,
-        lastname:value.lastname, 
-        username:value.username,
-        phone_num:value.phone_num,
-      }
-      // req.session.user = user
-      // console.log(" in session ",req.session.user);
-
-      // if (check) {
-      //   res.cookie("user", req.session.user);
-      //   console.log(" in cookie ",req.cookies);
-
-      // }  
-
-      // console.log("user id in session",req.session.user);
-      // res.locals ={
-      //   user:user,
-      // }
       return res.json(value);
     } else{
       return res.status(400).json({"error": "something" });
@@ -137,14 +107,58 @@ router.get('/profile/:id', async function(req, res, next) {
  var id = req.params.id
 
   let query = `SELECT * FROM users WHERE id =${id}`;
-  console.log("it works");
-
   try {
     var { rows} = await database.query(query);
-    res.send(rows)
+    res.send(rows[0])
   } catch (error) {
     console.log(error);
   }
 });
+router.get('/user', async function(req, res, next) {
+ 
+   let query = `SELECT id, firstname, lastname, role, username, phone_num FROM users`;
+ 
+   try {
+     var { rows} = await database.query(query);
+     res.send(rows)
+   } catch (error) {
+     console.log(error);
+   }
+ });
+ 
+ router.get("/user/:id", async function (req, res, next) {
+  const id = req.params.id;
+  console.log("id", id);
+  const query = ` DELETE FROM users WHERE id = ${id}`;
+  try {
+      await database.query(query);
+      return res.status(200).json({ "done": "something user delete" });
+  } catch (error) {
+      console.log("DATABASE EERROR", error)
+  }
+});
+
+router.post("/modify-user/:id", async function (req, res, next) {
+  const id = req.params.id;
+  console.log(id, "user modify id  ");
+  const firstName: string = req.body.firstName;
+  const lastName: string = req.body.lastName;
+  const phoneNumber: string = req.body.phoneNumber;
+  const username= req.body.userName
+  const role = req.body.role
+  
+  console.log(req.body, "req body ");
+
+  const qq = `UPDATE users SET firstname = '${firstName}', lastname = '${lastName}',
+           phone_num = '${phoneNumber}', role = '${role}',username = '${username}'
+            WHERE id = ${id}`;
+  try {
+      await database.query(qq);
+      return res.status(200).json({ "done": "something modify user" });
+  } catch (err) {
+      console.log("DATABASE ERROR", err)
+  }
+});
+
 
 module.exports = router;

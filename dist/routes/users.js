@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const dayjs_1 = __importDefault(require("dayjs"));
 const bcrypt = require("bcrypt");
 var router = express_1.default.Router();
 var database = require("./database");
@@ -23,25 +22,15 @@ router.post('/register', function (req, res, next) {
         const lastName = req.body.lastName;
         const userName = req.body.userName;
         const phoneNum = req.body.phoneNumber; //req.body.phoneNum; smh 
+        const role = req.body.role;
         const password = req.body.password;
         const hashedPass = bcrypt.hashSync(password, 10);
-        const created_on = (0, dayjs_1.default)().format();
-        console.log(req.body, hashedPass, created_on);
-        var q = `INSERT INTO users (firstname, lastname, username, password, created_on, phone_num)
-    VALUES ('${firstName}', '${lastName}', '${userName}', '${hashedPass}', '${created_on}', '${phoneNum}');`;
+        var q = `INSERT INTO users (firstname, lastname, username, password, phone_num, role)
+    VALUES ('${firstName}', '${lastName}', '${userName}', '${hashedPass}', '${phoneNum}','${role}');`;
         try {
             yield database.query(q);
             let result = yield logIn(req.body);
             if (result) {
-                let user = {
-                    id: result.id,
-                    firstname: result.firstname,
-                    lastname: result.lastname,
-                    username: result.username,
-                    phone_num: result.phone_num,
-                };
-                // req.session.user = user;
-                // console.log("user session",req.session.user);
                 return res.json(result);
             }
             else {
@@ -56,7 +45,7 @@ router.post('/register', function (req, res, next) {
 function logIn(body) {
     return __awaiter(this, void 0, void 0, function* () {
         var userName = body.userName;
-        var q = `SELECT id, firstname, lastname, username, password, phone_num FROM users WHERE username = '${userName}'`;
+        var q = `SELECT id, firstname, lastname, username, password, phone_num, role FROM users WHERE username = '${userName}'`;
         try {
             var { rows, rowCount } = yield database.query(q);
             if (rowCount == 0) {
@@ -115,23 +104,6 @@ router.post('/login', function (req, res, next) {
         try {
             let value = yield logIn(req.body);
             if (value) {
-                let user = {
-                    id: value.id,
-                    firstname: value.firstname,
-                    lastname: value.lastname,
-                    username: value.username,
-                    phone_num: value.phone_num,
-                };
-                // req.session.user = user
-                // console.log(" in session ",req.session.user);
-                // if (check) {
-                //   res.cookie("user", req.session.user);
-                //   console.log(" in cookie ",req.cookies);
-                // }  
-                // console.log("user id in session",req.session.user);
-                // res.locals ={
-                //   user:user,
-                // }
                 return res.json(value);
             }
             else {
@@ -150,10 +122,58 @@ router.get('/profile/:id', function (req, res, next) {
         console.log("it works");
         try {
             var { rows } = yield database.query(query);
+            res.send(rows[0]);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    });
+});
+router.get('/user', function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let query = `SELECT id, firstname, lastname, role, username, phone_num FROM users`;
+        try {
+            var { rows } = yield database.query(query);
             res.send(rows);
         }
         catch (error) {
             console.log(error);
+        }
+    });
+});
+router.get("/user/:id", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.params.id;
+        console.log("id", id);
+        const query = ` DELETE FROM users WHERE id = ${id}`;
+        try {
+            yield database.query(query);
+            return res.status(200).json({ "done": "something user delete" });
+        }
+        catch (error) {
+            console.log("DATABASE EERROR", error);
+        }
+    });
+});
+router.post("/modify-user/:id", function (req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const id = req.params.id;
+        console.log(id, "user modify id  ");
+        const firstName = req.body.firstName;
+        const lastName = req.body.lastName;
+        const phoneNumber = req.body.phoneNumber;
+        const username = req.body.userName;
+        const role = req.body.role;
+        console.log(req.body, "req body ");
+        const qq = `UPDATE users SET firstname = '${firstName}', lastname = '${lastName}',
+           phone_num = '${phoneNumber}', role = '${role}',username = '${username}'
+            WHERE id = ${id}`;
+        try {
+            yield database.query(qq);
+            return res.status(200).json({ "done": "something modify user" });
+        }
+        catch (err) {
+            console.log("DATABASE ERROR", err);
         }
     });
 });
