@@ -17,8 +17,9 @@ var router = express_1.default.Router();
 var database = require("./database");
 router.post('/reservation/:id', function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const RecurrenceRule = req.body.RecurrenceRule;
+        console.log(RecurrenceRule, "requrrence");
         const id = req.params.id;
-        console.log(id, "user id");
         const description = req.body.Description;
         const subject = req.body.Subject;
         const startTime = req.body.StartTime;
@@ -33,9 +34,9 @@ router.post('/reservation/:id', function (req, res, next) {
         console.log(description, subject, startTime, endTime, "reservation");
         console.log(source, client_id, destination, price, driver_id, vehicle_id, isFullDay);
         const info = `INSERT INTO reservations(description, subject, start_time, end_time, source, destination,
-                 price, client_id, user_id, driver_id, vehicle_id, isallday)
+                 price, client_id, user_id, driver_id, vehicle_id, isallday, rule)
                 VALUES('${description}', '${subject}', '${startTime}', '${endTime}', '${source}', '${destination}',
-                ${price}, ${client_id}, ${id}, ${driver_id}, ${vehicle_id}, ${isFullDay} )`;
+                ${price}, ${client_id}, ${id}, ${driver_id}, ${vehicle_id}, ${isFullDay},'${RecurrenceRule}' )`;
         try {
             yield database.query(info);
             return res.status(200).json({ "done": "something reservation" });
@@ -48,7 +49,7 @@ router.post('/reservation/:id', function (req, res, next) {
 router.get("/reservation", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const query = `SELECT id AS "Id", subject AS "Subject", description AS "Description", start_time AS "StartTime",
-         end_time AS "EndTime", source, destination AS "Location", driver_id, vehicle_id, price, isallday AS "IsAllDay" FROM reservations`;
+         end_time AS "EndTime", source, destination AS "Location", driver_id, vehicle_id, price, isallday AS "IsAllDay", rule AS "RecurrenceRule" FROM reservations`;
         try {
             const { rows } = yield database.query(query);
             if (rows) {
