@@ -69,8 +69,8 @@ router.post("/modify-client/:id", function (req, res, next) {
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
         const phoneNumber = req.body.phoneNumber;
-        console.log("id", id);
-        const query = `UPDATE clients SET firstname = '${firstName}', lastname = '${lastName}',phone_num = '${phoneNumber}'
+        const query = `UPDATE clients SET firstname = '${firstName}',
+             lastname = '${lastName}',phone_num = '${phoneNumber}'
              WHERE id = ${id}`;
         try {
             yield database.query(query);

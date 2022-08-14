@@ -97,7 +97,7 @@ router.get("/driver/:id", async function (req, res, next) {
 
 router.get("/statistic", async function (req, res, next) {
 
-    const query = `SELECT count(id) AS num FROM drivers`;
+    const query = `SELECT count(*) AS num FROM drivers`;
     try {
 
         var { rows } = await database.query(query);

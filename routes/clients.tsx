@@ -50,8 +50,8 @@ router.post("/modify-client/:id", async function (req, res, next) {
     const firstName: string = req.body.firstName;
     const lastName: string = req.body.lastName;
     const phoneNumber: string = req.body.phoneNumber;
-    console.log("id", id);
-    const query = `UPDATE clients SET firstname = '${firstName}', lastname = '${lastName}',phone_num = '${phoneNumber}'
+    const query = `UPDATE clients SET firstname = '${firstName}',
+             lastname = '${lastName}',phone_num = '${phoneNumber}'
              WHERE id = ${id}`;
     try {
         await database.query(query);
