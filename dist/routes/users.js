@@ -45,7 +45,8 @@ router.post('/register', function (req, res, next) {
 function logIn(body) {
     return __awaiter(this, void 0, void 0, function* () {
         var userName = body.userName;
-        var q = `SELECT id, firstname, lastname, username, password, phone_num, role FROM users WHERE username = '${userName}'`;
+        var q = `SELECT id, firstname, lastname, username, password,
+     phone_num, role FROM users WHERE username = '${userName}'`;
         try {
             var { rows, rowCount } = yield database.query(q);
             if (rowCount == 0) {
@@ -119,7 +120,6 @@ router.get('/profile/:id', function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         var id = req.params.id;
         let query = `SELECT * FROM users WHERE id =${id}`;
-        console.log("it works");
         try {
             var { rows } = yield database.query(query);
             res.send(rows[0]);

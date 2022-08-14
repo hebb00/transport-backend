@@ -115,8 +115,8 @@ router.get("/statistic", async function (req, res, next) {
 });
 
 router.get("/pie", async function (req, res, next) {
-    const query = `SELECT count(license_type) AS num FROM 
-        drivers WHERE license_type= 'heavy'`;
+    const query = `SELECT count(*) AS num FROM 
+        drivers WHERE license_type = 'heavy'`;
     try {
 
         var { rows } = await database.query(query);

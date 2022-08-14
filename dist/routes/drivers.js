@@ -128,8 +128,8 @@ router.get("/statistic", function (req, res, next) {
 });
 router.get("/pie", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = `SELECT count(license_type) AS num FROM 
-        drivers WHERE license_type= 'heavy'`;
+        const query = `SELECT count(*) AS num FROM 
+        drivers WHERE license_type = 'heavy'`;
         try {
             var { rows } = yield database.query(query);
             if (rows) {
