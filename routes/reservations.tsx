@@ -98,7 +98,7 @@ router.get("/clients-reservation", async function (req, res, next) {
     console.log("here client reservations")
     const query = `SELECT concat(clients.firstname, ' ',clients.lastname) AS clientname,
      count(*) AS num_books FROM clients JOIN reservations ON
-     clients.id = reservations.client_id GROUP BY clients.id ORDER BY num_books DESC`;
+     clients.id = reservations.client_id GROUP BY clients.id ORDER BY num_books DESC LIMIT 5`;
     try {
         const { rows } = await database.query(query);
         if (rows) {
@@ -113,7 +113,7 @@ router.get("/clients-reservation", async function (req, res, next) {
 
 router.get("/statistic", async function (req, res, next) {
 
-    const query = `SELECT count(id) AS num FROM reservations`;
+    const query = `SELECT count(*) AS num FROM reservations`;
     try {
 
         var { rows } = await database.query(query);

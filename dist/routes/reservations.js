@@ -18,7 +18,6 @@ var database = require("./database");
 router.post('/reservation/:id', function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const RecurrenceRule = req.body.RecurrenceRule;
-        console.log(RecurrenceRule, "requrrence");
         const id = req.params.id;
         const description = req.body.Description;
         const subject = req.body.Subject;
@@ -115,7 +114,7 @@ router.get("/clients-reservation", function (req, res, next) {
         console.log("here client reservations");
         const query = `SELECT concat(clients.firstname, ' ',clients.lastname) AS clientname,
      count(*) AS num_books FROM clients JOIN reservations ON
-     clients.id = reservations.client_id GROUP BY clients.id ORDER BY num_books DESC`;
+     clients.id = reservations.client_id GROUP BY clients.id ORDER BY num_books DESC LIMIT 5`;
         try {
             const { rows } = yield database.query(query);
             if (rows) {
@@ -130,7 +129,7 @@ router.get("/clients-reservation", function (req, res, next) {
 });
 router.get("/statistic", function (req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = `SELECT count(id) AS num FROM reservations`;
+        const query = `SELECT count(*) AS num FROM reservations`;
         try {
             var { rows } = yield database.query(query);
             if (rows) {
