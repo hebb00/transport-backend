@@ -34,9 +34,9 @@ router.post('/register', async function(req, res, next) {
 async function logIn(body:any) {
   var userName = body.userName;
   var q = `SELECT id, firstname, lastname, username, password,
-     phone_num, role FROM users WHERE username = '${userName}'`;
+     phone_num, role FROM users WHERE username = $1`;
   try {
-    var { rows, rowCount } = await database.query(q);
+    var { rows, rowCount } = await database.query(q,[userName]);
     if (rowCount == 0) {
       return null;
     }
@@ -58,12 +58,24 @@ router.post('/modify/:id', async function(req, res, next) {
   const userName : string = req.body.userName;
   const phoneNum : string = req.body.phoneNumber;
   const pass : string = req.body.password;
-  const hashedPass : string = bcrypt.hashSync(pass,10);
 
+
+ if (pass == ''){
+  let que = `SELECT password FROM users WHERE id =${id}`;
+  try {
+    var { rows} = await database.query(que);
+    var password  = rows[0].password;
+  } catch (error) {
+    console.log(error);
+ }
+ }
+ else{
+   password = bcrypt.hashSync(pass,10);
+ }
 
 
   const query : string = `UPDATE users SET firstname = '${firstName}',  lastname ='${lastName}',
-       username ='${userName}', password ='${hashedPass}', phone_num = '${phoneNum}' WHERE id =${id};`
+       username ='${userName}', password ='${password}', phone_num = '${phoneNum}' WHERE id =${id};`
 
   try {
        await database.query(query);
@@ -83,12 +95,10 @@ router.post('/modify/:id', async function(req, res, next) {
     console.log("DATABASE EERROR", error)
   }
   
-})
+});
 
 
 router.post('/login', async function(req, res, next) {
-  var check = req.body.check;
-  console.log(check,"this is check")
   try {
     let value = await logIn(req.body);
     if(value){
@@ -160,5 +170,24 @@ router.post("/modify-user/:id", async function (req, res, next) {
   }
 });
 
+
+router.get("/statistic", async function (req, res, next) {
+
+  const query = `SELECT count(*) AS num FROM users`;
+  try {
+
+      var { rows } = await database.query(query);
+      if (rows) {
+          res.json(rows[0])
+          console.log(rows[0], "users ");
+      } else {
+          return res.status(400).json({ "error": "something" });
+      }
+
+  } catch (error) {
+      console.log("DATABASE EERROR", error)
+  }
+
+});
 
 module.exports = router;
